@@ -24,6 +24,21 @@ data class TransformerWeights(
     val wcls: FloatArray,
 )
 
+data class RunState(
+    val x: Float,
+    val xb: Float,
+    val xb2: Float,
+    val hb: Float,
+    val hb2: Float,
+    val q: Float,
+    val k: Float,
+    val v: Float,
+    val att: Float,
+    val logits: Float,
+    val keyCache: FloatArray,
+    val valueCache: FloatArray,
+)
+
 class Llama {
 
 }
