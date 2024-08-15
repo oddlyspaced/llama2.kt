@@ -39,6 +39,12 @@ data class RunState(
     val valueCache: FloatArray,
 )
 
+data class Transformer(
+    val config: Config,
+    val weights: TransformerWeights,
+    val state: RunState,
+)
+
 class Llama {
 
 }
