@@ -8,6 +8,22 @@ data class Config(
     val seqLen: Int, // max sequence length
 )
 
+data class TransformerWeights(
+    val tokenEmbeddingTable: FloatArray,
+    // weights for rmsnorms
+    val rmsAttWeight: FloatArray, // rmsnorm weights
+    val rmsFFNWeight: FloatArray,
+    val wq: FloatArray,
+    val wk: FloatArray,
+    val wv: FloatArray,
+    val wo: FloatArray,
+    val w1: FloatArray,
+    val w2: FloatArray,
+    val w3: FloatArray,
+    val rmsFinalWeight: FloatArray,
+    val wcls: FloatArray,
+)
+
 class Llama {
 
 }
