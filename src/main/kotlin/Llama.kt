@@ -5,6 +5,7 @@ import java.io.IOException
 import java.util.Arrays
 import kotlin.math.exp
 import kotlin.math.sqrt
+import kotlin.system.exitProcess
 
 data class Config(
     val dim: Int, // transformer dimension
@@ -97,25 +98,25 @@ fun matmul(x: FloatArray, w: FloatArray, n: Int, d: Int): FloatArray {
     return output
 }
 
-//fun forward(transformer: Transformer, token: Int, pos: Int) {
-//    val config = transformer.config // p
-//    val weights = transformer.weights // w
-//    val state = transformer.state // s
-//    val x = state.x
-//    val dim = config.dim
-//    val kvDim = (config.dim * config.kvHeadCount) / config.headCount
-//    val kvMul = config.headCount / config.kvHeadCount
-//    val hiddenDim = config.hiddenDim
-//    val headSize = dim / config.headCount
-//
-//    // copy the token embedding into x
-//    val contentRow = weights.tokenEmbeddingTable[token * dim]
-//    state.x = contentRow
-//
-//    for (l in 0..<config.layerCount) {
-//         rmsnorm(x, )
-//    }
-//}
+fun forward(transformer: Transformer, token: Int, pos: Int): FloatArray {
+    val config = transformer.config // p
+    val weights = transformer.weights // w
+    val state = transformer.state // s
+    val x = state.x
+    val dim = config.dim
+    val kvDim = (config.dim * config.kvHeadCount) / config.headCount
+    val kvMul = config.headCount / config.kvHeadCount
+    val hiddenDim = config.hiddenDim
+    val headSize = dim / config.headCount
+
+    // copy the token embedding into x
+    val contentRow = weights.tokenEmbeddingTable[token * dim]
+    state.x = contentRow
+
+    for (l in 0..<config.layerCount) {
+
+    }
+}
 
 // Byte Pair Encoding
 
@@ -402,13 +403,47 @@ fun generate(transformer: Transformer, tokenizer: Tokenizer, sampler: Sampler, p
     val numPromptTokens = 0
     val promptTokens = IntArray(prompt.length + 3)
 
+    // todo : update usage in future
     encode(tokenizer, prompt, 1, 0, promptTokens, numPromptTokens)
+    if (numPromptTokens < 1) {
+        println("Error: expected atleast 1 token")
+        exitProcess(0)
+    }
 
+    var start = 0L
+    var next: Int
+    var token = promptTokens[0]
+    var pos = 0
+    while (pos < steps) {
+        val logits = forward(transformer, token, pos)
+        if (pos < numPromptTokens - 1) {
+            next = promptTokens[pos + 1]
+        } else {
+            next = sample(sampler, logits)
+        }
+        pos++
+        if (next == 1) {
+            break
+        }
+        val piece = decode(tokenizer, token, next)
+        println(piece)
+        token = next
 
+        if (start == 0L) {
+            start = timeInMs()
+        }
+    }
+    println()
+
+    if (pos > 1) {
+        val end = timeInMs()
+        // todo: token speed here
+    }
+
+    // todo: free prompt tokens ?
 }
 
-
-class Llama {
+fun readStdin() {
 
 }
 
